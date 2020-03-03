@@ -2,7 +2,7 @@
 
 ## Projektna - olimpijske igre (disciplina Atletika) 
 
-Na projektu delave Saša Ošlaj in Tina Korošec.
+Na projektu delave Saša Ošlaj in Tina Krašovec.
 
 1. teden - pobiranje podatkov z interneta in jih ustrezno shraniti
 
