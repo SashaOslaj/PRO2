@@ -68,7 +68,7 @@ def prenesi_html_drzave():
     Funkcija za shranitev html datoteke iz wikipedije za slike zastav.
     '''
     
-    for kratica, drzava in slovar_drzav.items():       
+    for _, drzava in slovar_drzav.items():       
         if drzava in {'Unified_Team_Ex_Ussr_In_1992','_Independent_Olympic_Athletes','Bohemia_Tch_Since_1920','British_West_Indies_Bar_Jam', 'Independant Olympic Participant', 'Refugee Olympic Team', 'International Olympic Committee', 'Independent Olympic Athletes'}:
             continue                
         naslov = osnovni_naslov + "/wiki/" + drzava
@@ -77,8 +77,10 @@ def prenesi_html_drzave():
         orodja.shrani(naslov, pot)
 
 seznam = {}
+koordinate = []
 
 def dobi_tabelo_slike_in_koordinate(datoteka):
+    sez = {}
     with open(str(datoteka), 'r', encoding='utf-8') as dat:
         vsebina = dat.read()
         for tabela in re.finditer(
@@ -100,29 +102,35 @@ def dobi_tabelo_slike_in_koordinate(datoteka):
                     continue
                 elif drzava == dolgo:
                     seznam[kratica] = [slika, geo_visina, geo_sirina]
+                    sez['kratica_drzave'] = kratica
+                    sez['geo_visina'] = geo_visina
+                    sez['geo_sirina'] = geo_sirina
+                    koordinate.append(sez)
         return seznam
 
 def shrani_slike():
     for krat, dat in slovar_drzav.items():
+        if dat in {'Unified_Team_Ex_Ussr_In_1992','_Independent_Olympic_Athletes','Bohemia_Tch_Since_1920','British_West_Indies_Bar_Jam', 'Independant Olympic Participant', 'Refugee Olympic Team', 'International Olympic Committee', 'Independent Olympic Athletes'}:
+            continue
         datoteka = "{}.html".format(dat)
         pot = os.path.join("drzave", datoteka)
         pot_slike = os.path.join("slike", "{}.png".format(krat))
-        
         podatki = dobi_tabelo_slike_in_koordinate(pot)
-        print(podatki.key(),pot_slike)
-        #urllib.request.urlretrieve(slovar_drzav[krat][0], pot_slike)
-        
-        
+        pod = podatki.get(krat)
+        if pod:
+            naslov = pod[0]
+            slika = 'https:{}.png'.format(naslov[:-8])
+            urllib.request.urlretrieve(slika, pot_slike)
+            orodja.zapisi_tabelo(koordinate, ['kratica_drzave', 'geo_visina', 'geo_sirina'], 'koordinate.csv')
+
+
+      
         
                    
-slovar_drzav = pridobi_drzave('seznam_drzav.csv')
+#slovar_drzav = pridobi_drzave('seznam_drzav.csv')
 #print(slovar_drzav)
-#dobi_tabelo_slike_in_koordinate('drzave\Ivory_Coast.html')
-#dobi_tabelo_slike_in_koordinate('drzave\Jamaica.html')
-shrani_slike()
+#shrani_slike()
 #prenesi_html_drzave()
-
-#print(seznam)
 
 
 
