@@ -80,6 +80,9 @@ seznam = {}
 koordinate = []
 
 def dobi_tabelo_slike_in_koordinate(datoteka):
+    '''
+    Funkcija sprejme datoteko in iz nje izbere podatke url slike, geografsko sirino in geografsko visino.
+    '''
     sez = {}
     with open(str(datoteka), 'r', encoding='utf-8') as dat:
         vsebina = dat.read()
@@ -106,9 +109,12 @@ def dobi_tabelo_slike_in_koordinate(datoteka):
                     sez['geo_visina'] = geo_visina
                     sez['geo_sirina'] = geo_sirina
                     koordinate.append(sez)
-        return seznam
+    return seznam
 
 def shrani_slike():
+    '''
+    Funkcija shrani slike in naredi csv datoteko s podatki o geografski sirin in visini.
+    '''
     for krat, dat in slovar_drzav.items():
         if dat in {'Unified_Team_Ex_Ussr_In_1992','_Independent_Olympic_Athletes','Bohemia_Tch_Since_1920','British_West_Indies_Bar_Jam', 'Independant Olympic Participant', 'Refugee Olympic Team', 'International Olympic Committee', 'Independent Olympic Athletes'}:
             continue
@@ -122,6 +128,48 @@ def shrani_slike():
             slika = 'https:{}.png'.format(naslov[:-8])
             urllib.request.urlretrieve(slika, pot_slike)
             orodja.zapisi_tabelo(koordinate, ['kratica_drzave', 'geo_visina', 'geo_sirina'], 'koordinate.csv')
+
+def prenesi_url_ikon():
+    pot = os.path.join('oi', 'oi_ikone.html')
+    orodja.shrani('https://www.olympic.org/summer-games', pot)
+
+def shrani_ikone_oi():
+    '''
+    Funkcija shrani slike ikon olimpijskih iger.
+    '''
+    slovar_oi = {
+        'rio-2016': 'BRA',
+        'london-2012': 'GBR',
+        'beijing-2008': 'CHN',
+        'athens-2004': 'GRE',
+        'sydney-2000': 'AUS',
+        'atlanta-1996': 'USA',
+        'barcelona-1992': 'ESP',
+        'seoul-1988': 'KOR',
+        'los-angeles-1984': 'USA',
+        'moscow-1980': 'RUS',
+        'montreal-1976': 'CAN',
+        'munich-1972': 'GER',
+        'mexico-1968': 'MEX',
+        'tokyo-1964': 'JPN',
+        'rome-1960': 'ITA',
+        'melbourne-stockholm-1956': 'AUS',
+        'helsinki-1952': 'FIN',
+        'london-1948': 'GBR',
+        'berlin-1936': 'GER',
+        'los-angeles-1932': 'USA',
+        'amsterdam-1928': 'NED',
+        'paris-1924': 'FRA',
+        'antwerp-1920': 'BEL',
+        'stockholm-1912':'SWE',
+        'london-1908': 'GBR',
+        'st-louis-1904': 'USA',
+        'paris-1900': 'FRA',
+        'athens-1896': 'GRE'
+    }
+    sez_ikon = []
+
+
 
 
       
