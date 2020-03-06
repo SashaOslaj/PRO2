@@ -138,38 +138,54 @@ def shrani_ikone_oi():
     Funkcija shrani slike ikon olimpijskih iger.
     '''
     slovar_oi = {
-        'rio-2016': 'BRA',
-        'london-2012': 'GBR',
-        'beijing-2008': 'CHN',
-        'athens-2004': 'GRE',
-        'sydney-2000': 'AUS',
-        'atlanta-1996': 'USA',
-        'barcelona-1992': 'ESP',
-        'seoul-1988': 'KOR',
-        'los-angeles-1984': 'USA',
-        'moscow-1980': 'RUS',
-        'montreal-1976': 'CAN',
-        'munich-1972': 'GER',
-        'mexico-1968': 'MEX',
-        'tokyo-1964': 'JPN',
-        'rome-1960': 'ITA',
-        'melbourne-stockholm-1956': 'AUS',
-        'helsinki-1952': 'FIN',
-        'london-1948': 'GBR',
-        'berlin-1936': 'GER',
-        'los-angeles-1932': 'USA',
-        'amsterdam-1928': 'NED',
-        'paris-1924': 'FRA',
-        'antwerp-1920': 'BEL',
-        'stockholm-1912':'SWE',
-        'london-1908': 'GBR',
-        'st-louis-1904': 'USA',
-        'paris-1900': 'FRA',
-        'athens-1896': 'GRE'
+        'rio-2016': 'BRA-2016',
+        'london-2012': 'GBR-2012',
+        'beijing-2008': 'CHN-2008',
+        'athens-2004': 'GRE-2004',
+        'sydney-2000': 'AUS-2000',
+        'atlanta-1996': 'USA-1996',
+        'barcelona-1992': 'ESP-1992',
+        'seoul-1988': 'KOR-1988',
+        'los-angeles-1984': 'USA-1984',
+        'moscow-1980': 'RUS-1980',
+        'montreal-1976': 'CAN-1976',
+        'munich-1972': 'GER-1972',
+        'mexico-1968': 'MEX-1968',
+        'tokyo-1964': 'JPN-1964',
+        'rome-1960': 'ITA-1960',
+        'melbourne-stockholm-1956': 'AUS-1956',
+        'helsinki-1952': 'FIN-1952',
+        'london-1948': 'GBR-1948',
+        'berlin-1936': 'GER-1936',
+        'los-angeles-1932': 'USA-1932',
+        'amsterdam-1928': 'NED-1928',
+        'paris-1924': 'FRA-1924',
+        'antwerp-1920': 'BEL-1920',
+        'stockholm-1912':'SWE-1912',
+        'london-1908': 'GBR-1908',
+        'st-louis-1904': 'USA-1904',
+        'paris-1900': 'FRA-1900',
+        'athens-1896': 'GRE-1896'
     }
     sez_ikon = []
-
-
+    with open('oi\oi_ikone.html', 'r', encoding='utf-8') as dat:
+        vsebina = dat.read()
+        for ikona in re.finditer(
+            r'<li>.+?'
+            r'<a href="/(?P<oi>.*?)">'
+            r'.*?<picture>'
+            r'.+?<img data-src="(?P<urlslike>.+?)".+? alt="" class="lazyload">'
+            r'.*?</picture>'
+            r'.+?</li>'
+            , vsebina, flags=re.DOTALL):
+            oi = ikona.group('oi')
+            urlslike = ikona.group('urlslike')
+            if oi in {'olympic-games', 'paris-2024', 'tokyo-2020'}:
+                continue
+            oi = slovar_oi[oi]
+            sez_ikon.append([oi, urlslike])
+            pot_slike =  os.path.join('oi', "{}.png".format(oi))
+            urllib.request.urlretrieve(urlslike, pot_slike)
 
 
       
@@ -179,7 +195,8 @@ def shrani_ikone_oi():
 #print(slovar_drzav)
 #shrani_slike()
 #prenesi_html_drzave()
-
+#prenesi_url_ikon()
+#shrani_ikone_oi()
 
 
 
