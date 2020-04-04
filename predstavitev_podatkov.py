@@ -101,6 +101,9 @@ class Tekmovalci:
         return "Tekmovalci({})".format(self.vsi_tekmovalci)
 
     def izpisi_tekmovalca(self, ime=None):
+        '''
+        Funkcija vrne izpis podatkov za tekmovalca, ce ga podamo, sicer si ga nakljucno izbere.
+        '''
         if ime == None:
             ime = random.choice(self.sez_tekmovalcev)
             return Tekmovalec(ime, podatki_tekmovalcev[ime][:-1], podatki_tekmovalcev[ime][-1])
@@ -108,6 +111,10 @@ class Tekmovalci:
             return Tekmovalec(ime, podatki_tekmovalcev[ime][:-1], podatki_tekmovalcev[ime][-1])
 
     def natancno_izpisi_tekmovalca(self, ime=None):
+        '''
+        Funkcija vrne seznam naborov z imenom, rojstvom,drzavo, rezultatom in starostjo za tekmovalca, ki ga napisemo oz
+        ce ne podamo tekmovalca, ga funkcija nakljucno izbere. 
+        '''
         if ime == None:
             ime = random.choice(self.sez_tekmovalcev)
             return Tekmovalec(ime, podatki_tekmovalcev[ime][:-1], podatki_tekmovalcev[ime][-1]).natancna_predstavitev_tekmovalca()
@@ -115,6 +122,9 @@ class Tekmovalci:
             return Tekmovalec(ime, podatki_tekmovalcev[ime][:-1], podatki_tekmovalcev[ime][-1]).natancna_predstavitev_tekmovalca()
 
     def tekmovalci_po_disciplinah(self):
+        '''
+        Funkcija vrne slovar, kjer so kljuci discipline in vrednosti so seznami tekmovalcev z njihovimi rezultati.
+        '''
         vsi=[(
             ime,
             Tekmovalec(ime, podatki_tekmovalcev[ime][:-1], podatki_tekmovalcev[ime][-1]).podatki_po_disciplinah(),
@@ -130,6 +140,9 @@ class Tekmovalci:
         return razvrsceno_po_disciplinah
 
     def leta_tekmovalcev(self):
+        '''
+        Funkcija vrne slovar, kjer so kljuci discipline in vrednosti so seznami tekmovalcev z njihovimi rezultati in starostmi.
+        '''
         slovar={}
         for disc in self.vse_discipline:
             slovar[disc]=[]
@@ -149,6 +162,9 @@ class Tekmovalci:
         return slovar
 
     def zmagovalci_po_disciplinah(self):
+        '''
+        Funkcija vrne slovar, kjer so kljuci discipline in vrednosti so tekmovalci s prvih treh mest z rezultati.
+        '''
         zmagovalci={}
         for disc in self.vse_discipline:
             zmagovalci[disc]=[]
@@ -160,34 +176,38 @@ class Tekmovalci:
         return zmagovalci
 
     def najmaljsi_tekmovalec_po_disciplinah(self):
-        print(len(self.vse_discipline))
+        '''
+        Funkcija vrne slovar, kjer so kljuci discipline in vrednost je najmlajsi tekmovalec pri tej disciplini.
+        '''
         najmlajsi=set()
         for disc in self.leta_tekmovalcev():
             trenutni_min = (100, ())
-            print(trenutni_min, len(najmlajsi))
             for ime, nastopi in self.leta_tekmovalcev()[disc]:
                 for nastop in nastopi:
                     if nastop[-1] != '' and int(nastop[-1]) < int(trenutni_min[0]):
                         trenutni_min = (nastop[-1], (ime, disc, nastop[0][-4:],nastop[4]))
             najmlajsi.add(trenutni_min)
-        print('end', len(self.vse_discipline), len(najmlajsi))
         return najmlajsi
 
     def najstarejsi_tekmovalec_po_disciplinah(self):
-        print(len(self.vse_discipline))
+        '''
+        Funkcija vrne slovar, kjer so kljuci discipline in vrednost je najstarejsi tekmovalec pri tej disciplini.
+        '''
         najstarejsi = set()
         for disc in self.leta_tekmovalcev():
             trenutni_max = (0, ())
-            print(trenutni_max, len(najstarejsi))
             for ime, nastopi in self.leta_tekmovalcev()[disc]:
                 for nastop in nastopi:
                     if nastop[-1] != '' and int(nastop[-1]) > int(trenutni_max[0]):
                         trenutni_max = (nastop[-1], (ime, disc, nastop[0][-4:],nastop[4]))
             najstarejsi.add(trenutni_max)
-        print('end', len(self.vse_discipline), len(najstarejsi))
         return najstarejsi
 
     def st_raz_drzav_pri_disc(self, disc):
+        '''
+        Funkcija vrne slovar, kjer so kljuci olimpijske igre in vrednosti so stevilo razlicnih drzav pri teh olimpijskih
+        igrah in podatni disciplini.
+        '''
         slovar1 = self.tekmovalci_po_disciplinah()
         slovar2={}
         for i in self.oi:
@@ -200,6 +220,10 @@ class Tekmovalci:
         return slovar2
 
     def tekmovalec_in_drzava(self):
+        '''
+        Funkcija vrne slovar, kjer so kljuci drzave in vrenosti so stevilo razlicnih tekmovalcev iz te drzave
+        skozi vse olimpijske igre.
+        '''
         mnozica=set()
         for ime in self.sez_tekmovalcev:
             tekmovalec=self.natancno_izpisi_tekmovalca(ime)
@@ -213,6 +237,239 @@ class Tekmovalci:
                 slovar[drzava] = 1
         return slovar
     
+
+########################################################################################################################
+########################################################################################################################
+
+def plot_evolve(slovar, disciplina):
+    '''
+    Spreminjanje rezultatov skozi cas pri podani disciplini.
+    '''
+
+    seznam1,seznam2,seznam3=[[],[],[]]
+    leto1,leto2,leto3=[[],[],[]]
+    rezultat1,rezultat2,rezultat3=[[],[],[]]
+
+    for _,sez,_ in slovar[disciplina]:
+        for s in sez:
+            if s[2]=='':
+                continue
+            s2=''
+            r=0
+            # Resimo problem, ker so pri disciplinah z dalsimi casi nekonsistentni zapisi.
+            for i in s[2]:
+                if i == 'h' or i == '-':
+                    s2 += ':'
+                if i == '"':
+                    continue
+                else:
+                    s2 += i
+            # Zapis v urah pri disciplinah z daljsimi progami
+            for j,i in enumerate(s2.split(':')):
+                if j == 0:
+                    r += float(i)
+                if j == 1:
+                    r += float(i)/60
+                if j == 2:
+                    r += float(i)/3600
+            # Resimi problem pri dolocenih disciplinah
+            if disciplina=='long jump men' and s[0]=='1900':
+                continue
+            if disciplina=='decathlon men' and s[0]=='2004':
+                continue
+            if disciplina=='heptathlon women' and s[0]=='2004':
+                continue
+            else:
+                if s[1] == '1':
+                    try:
+                        seznam1.append((float(s[0]),float(r)))
+                    except:
+                        continue
+                if s[1] == '2':
+                    try:
+                        seznam2.append((float(s[0]),float(r)))
+                    except:
+                        continue
+                if s[1] == '3':
+                    try:
+                        seznam3.append((float(s[0]),float(r)))
+                    except:
+                        continue
+
+    # Naredimo sezname potrebne za risanje grafa
+    for i, j in sorted(seznam1[::-1]):
+        leto1.append(i)
+        rezultat1.append(j)
+    for i, j in sorted(seznam2[::-1]):
+        leto2.append(i)
+        rezultat2.append(j)
+    for i, j in sorted(seznam3[::-1]):
+        leto3.append(i)
+        rezultat3.append(j)
+
+    # Izris oz shranitev grafa
+    fig = plt.figure()
+
+    plt.plot(leto1, rezultat1, marker='o',color='gold',markeredgecolor = 'white',zorder=0,label="1.mesto")
+    plt.plot(leto2, rezultat2, marker='o',color='gray',markeredgecolor = 'white',zorder=0,label="2.mesto")
+    plt.plot(leto3, rezultat3, marker='o',color='brown',markeredgecolor = 'white',zorder=0,label="3.mesto")
+
+    plt.title("Spreminjanje rezultatov skozi cas pri disciplini {}".format(disciplina))
+    plt.xlabel("Leta")
+    plt.ylabel("Rezultati")
+    plt.legend(loc='best')
+
+    #plt.show()
+    #fig.savefig('rezultati_skozi_cas_pri_{}_disciplini'.format(disciplina))
+
+def bar_st_drzav_po_disc(slovar, disciplina):
+    '''
+    Stevilo drzav pri doloceni disciplini
+    '''
+
+    olimpijske_igre=[]
+    st_drzav=[]
+
+    # Naredimo sezname potrebne za risanje grafa
+    for oi in slovar:
+        if slovar[oi] != 0:
+            olimpijske_igre.append(float(oi[-4:]))
+            st_drzav.append(slovar[oi])
+
+    # Izris oz shranitev grafa
+    fig=plt.figure(figsize=(6,10))
+
+    plt.barh(olimpijske_igre,st_drzav,color='gray',edgecolor='white')
+    plt.title('Stevilo drzav pri {} disciplini'.format(disciplina))
+    plt.ylabel('Olimpijske igre')
+    plt.xlabel('Stevilo drzav')
+
+    #plt.show()
+    #fig.savefig('stevilo_drzav_skozi_cas_pri_{}_disciplini'.format(disciplina))
+
+def st_tek_iz_drzav(slovar):
+    '''
+    Stevilo tekmovalcev iz posameznih drzav, kjer je stevilo vecje od 100.
+    '''
+
+    drzave = []
+    st_tekmovalcev = []
+
+    # Naredimo sezname potrebne za risanje grafa
+    for drzava in slovar:
+        if slovar[drzava] >= 100:
+            drzave.append(drzava)
+            st_tekmovalcev.append(slovar[drzava])
+
+    # Izris oz shranitev grafa
+    fig=plt.figure(figsize=(6,10))
+
+    plt.barh(drzave, st_tekmovalcev, color='gray',edgecolor='white')
+    plt.title('Stevilo tekmovalcev iz posameznih drzav, kjer je stevilo vecje od 100')
+    plt.xlabel('Drzave')
+    plt.ylabel('Stevilo tekmovalcev')
+
+    fig.autofmt_xdate()
+    #plt.show()
+    #fig.savefig('St_tek_iz_pos_drzave')
+
+def men_vs_women(slovar, mendisciplina, womendisciplina):
+    '''
+    Primerjava moskih in zenskih zmagovalcev skozi cas pri doloceni disciplini.
+    '''
+
+    seznam1,seznam2=[[],[]]
+    leto1,leto2=[[],[]]
+    rezultat1,rezultat2=[[],[]]
+    
+    for _,sez,_ in slovar[mendisciplina]:
+        sez
+        for s in sez:
+            if s[2]=='':
+                continue
+            s2=''
+            r=0
+            # Resimo problem, ker so pri disciplinah z dalsimi casi nekonsistentni zapisi.
+            for i in s[2]:
+                if i == 'h' or i == '-':
+                    s2 += ':'
+                if i == '"':
+                    continue
+                else:
+                    s2 += i
+            # Zapis v urah pri disciplinah z daljsimi progami
+            for j,i in enumerate(s2.split(':')):
+                if j == 0:
+                    r += float(i)
+                if j == 1:
+                    r += float(i)/60
+                if j == 2:
+                    r += float(i)/3600
+            # Resimi problem pri doloceni disciplini
+            if mendisciplina=='long jump men' and s[0]=='1900':
+                continue
+            else:
+                if s[1] == '1':
+                    try:
+                        seznam1.append((float(s[0]),float(r)))
+                    except:
+                        continue
+
+    for _,sez,_ in slovar[womendisciplina]:
+        sez
+        for s in sez:
+            if s[2]=='':
+                continue
+            s2=''
+            r=0
+            # Resimo problem, ker so pri disciplinah z dalsimi casi nekonsistentni zapisi.
+            for i in s[2]:
+                if i == 'h' or i == '-':
+                    s2 += ':'
+                if i=='"':
+                    continue
+                else:
+                    s2 += i
+            # Zapis v urah pri disciplinah z daljsimi progami
+            for j,i in enumerate(s2.split(':')):
+                if j == 0:
+                    r += float(i)
+                if j == 1:
+                    r += float(i)/60
+                if j == 2:
+                    r += float(i)/3600
+            # Resimi problem pri doloceni disciplini
+            if womendisciplina=='long jump men' and s[0]=='1900':
+                continue
+            else:
+                if s[1] == '1':
+                    try:
+                        seznam2.append((float(s[0]),float(r)))
+                    except:
+                        continue
+
+    # Naredimo sezname potrebne za risanje grafa
+    for i, j in sorted(seznam1[::-1]):
+        leto1.append(i)
+        rezultat1.append(j)
+    for i, j in sorted(seznam2[::-1]):
+        leto2.append(i)
+        rezultat2.append(j)
+
+    # Izris oz shranitev grafa
+    fig = plt.figure()
+
+    plt.plot(leto1, rezultat1, marker='o',color='gold',markeredgecolor = 'white',zorder=0,label="moski")
+    plt.plot(leto2, rezultat2, marker='o',color='gray',markeredgecolor = 'white',zorder=0,label="zenske")
+    
+    plt.title("Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}".format(mendisciplina[:-4]))
+    plt.xlabel("Leta")
+    plt.ylabel("Rezultati")
+    plt.legend(loc='best')
+
+    #plt.show()
+    #fig.savefig('Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}'.format(mendisciplina[:-4]))
+
 
 ########################################################################################################################
 ########################################################################################################################
@@ -250,160 +507,37 @@ with open('roj_dan_tekmovalcev.csv', 'r', encoding="utf-8") as dat:
 ########################################################################################################################
 ########################################################################################################################
 
-BLACK, WHITE = [0.01] * 3, [0.9] * 3
-
-def plot_evolve(slovar, disciplina):
-
-    seznam1=[]
-    seznam2=[]
-    seznam3=[]
-    leto1=[]
-    leto2=[]
-    leto3=[]
-    rezultat1=[]
-    rezultat2=[]
-    rezultat3=[]
-
-    for _,sez,_ in slovar[disciplina]:
-        print(sez)
-        for s in sez:
-            if s[2]=='':
-                continue
-            s2=''
-            r=0
-            for i in s[2]:
-                if i == 'h' or i == '-':
-                    s2 += ':'
-                else:
-                    s2 += i
-            for j,i in enumerate(s2.split(':')):
-                if j == 0:
-                    r += float(i)
-                if j == 1:
-                    r += float(i)/60
-                if j == 2:
-                    r += float(i)/3600
-            if disciplina=='long jump men' and s[0]=='1900':
-                continue
-            if disciplina=='decathlon men' and s[0]=='2004':
-                continue
-            if disciplina=='heptathlon women' and s[0]=='2004':
-                continue
-            else:
-                if s[1] == '1':
-                    try:
-                        seznam1.append((float(s[0]),float(r)))
-                    except:
-                        continue
-                if s[1] == '2':
-                    try:
-                        seznam2.append((float(s[0]),float(r)))
-                    except:
-                        continue
-                if s[1] == '3':
-                    try:
-                        seznam3.append((float(s[0]),float(r)))
-                    except:
-                        continue
-
-    for i, j in sorted(seznam1[::-1]):
-        leto1.append(i)
-        rezultat1.append(j)
-    for i, j in sorted(seznam2[::-1]):
-        leto2.append(i)
-        rezultat2.append(j)
-    for i, j in sorted(seznam3[::-1]):
-        leto3.append(i)
-        rezultat3.append(j)
-
-    fig = plt.figure()
-
-    plt.plot(leto1, rezultat1, marker='o',color='gold',markeredgecolor = WHITE,zorder=0,label="1.mesto")
-    plt.plot(leto2, rezultat2, marker='o',color='gray',markeredgecolor = WHITE,zorder=0,label="2.mesto")
-    plt.plot(leto3, rezultat3, marker='o',color='brown',markeredgecolor = WHITE,zorder=0,label="3.mesto")
-
-    plt.title("Spreminjanje rezultatov skozi cas pri disciplini {}".format(disciplina))
-    plt.xlabel("Leta")
-    plt.ylabel("Rezultati")
-    plt.legend(loc='best')
-
-    #plt.show()
-    #fig.savefig('rezultati_skozi_cas_pri_{}_disciplini'.format(disciplina))
-
-def bar_st_drzav_po_disc(slovar, disciplina):
-
-    olimpijske_igre=[]
-    st_drzav=[]
-
-    for oi in slovar:
-        olimpijske_igre.append(float(oi[-4:]))
-        st_drzav.append(slovar[oi])
-
-    print(olimpijske_igre)
-    print(st_drzav)
-
-    fig=plt.figure(figsize=(6,10))
-
-    plt.barh(olimpijske_igre,st_drzav,color='gray',edgecolor='black')
-    plt.title('Stevilo drzav pri {} disciplini'.format(disciplina))
-    plt.xlabel('Olimpijske igre')
-    plt.ylabel('Stevilo drzav')
-
-    #plt.show()
-    #fig.savefig('stevilo_drzav_skozi_cas_pri_{}_disciplini'.format(disciplina))
-
-def st_tek_iz_drzav(slovar):
-
-    drzave = []
-    st_tekmovalcev = []
-
-    for drzava in slovar:
-        if slovar[drzava] == 1:
-            drzave.append(drzava)
-            st_tekmovalcev.append(slovar[drzava])
-
-    fig=plt.figure(figsize=(6,10))
-
-    plt.barh(drzave, st_tekmovalcev, color='gray',edgecolor='white')
-    plt.title('Stevilo tekmovalcev iz posameznih drzav, kjer je stevilo vecje od 100')
-    plt.xlabel('Drzave')
-    plt.ylabel('Stevilo tekmovalcev')
-
-    fig.autofmt_xdate()
-    #plt.show()
-    #fig.savefig('St_tek_iz_pos_drzave')
-
-    
-    
-
-
-
-########################################################################################################################
-############################################################################################################
-            
 # Podatki, ki jih uporabimo
 
-#print(podatki_tekmovalcev)
-#for i in sorted(podatki_tekmovalcev)[1:]:
-#    print(i,podatki_tekmovalcev[i])
+slovar=Tekmovalci(podatki_tekmovalcev).zmagovalci_po_disciplinah()
 
-#print(
-#Tekmovalec(
-#    "Usain Bolt",
-#    podatki_tekmovalcev["Usain Bolt"][:-1],
-#    podatki_tekmovalcev["Usain Bolt"][-1]
-#).predstavitev_tekmovalca_pri_disciplini())
+# za funkcijo plot_evolve
+discipline1=['marathon women','marathon men','10000m women','10000m men',
+             '5000m women','5000m men','1500m women','1500m men',
+             '50km walk men','20km walk men','hammer throw men','triple jump women',
+             '100m hurdles women','hammer throw women','400m men','400m women',
+             '400m hurdles men','400m hurdles women','triple jump men']
+for disciplina in discipline1:
+    plot_evolve(slovar, disciplina)
 
-#slovar=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
-#st_tek_iz_drzav(slovar)
+# za funkcijo bar_st_drzav_po_disc
+discipline2=['discus throw women','long jump men','high jump women','800m women',
+             'marathon men','100m women','discus throw men','100m men']
+for disciplina in discipline2:
+    bar_st_drzav_po_disc(slovar, disciplina)
 
-#bar_st_drzav_po_disc(Tekmovalci(podatki_tekmovalcev).st_raz_drzav_pri_disc('100m men'),'100m men')
+# za funkcijo st_tek_iz_drzav
+drzave=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
+st_tek_iz_drzav(drzave)
 
-#print(len(disc))
-#for i in Tekmovalci(podatki_tekmovalcev).vse_discipline:
-#                bar_st_drzav_po_disc(Tekmovalci(podatki_tekmovalcev).st_raz_drzav_pri_disc('{}'.format(i)),'{}'.format(i))
-    
-                
+# za funkcijo men_vs_women
+seznam3=[('shot put men','shot put women'),('100m men','100m women'),
+        ('200m men','200m women'),('javelin throw men','javelin throw women'),
+        ('long jump men','long jump women'),('high jump men', 'high jump women'),
+        ('discus throw men','discus throw women')]
+
+for men, women in seznam3:
+    men_vs_women(slovar,men,women)
 
 
 
