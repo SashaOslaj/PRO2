@@ -1,8 +1,10 @@
 import random
 
+from math import sqrt
+
 import matplotlib.pyplot as plt
 import numpy as np
-#from mpl_toolkits.basemap import Basemap
+from mpl_toolkits.basemap import Basemap
 
 
 ########################################################################################################################
@@ -258,11 +260,13 @@ def plot_evolve(slovar, disciplina):
             r=0
             # Resimo problem, ker so pri disciplinah z dalsimi casi nekonsistentni zapisi.
             for i in s[2]:
-                if i == 'h' or i == '-':
+                if i == 'h':
                     s2 += ':'
+                if i=='-':
+                    s2+=':'
                 if i == '"':
                     continue
-                else:
+                if i != 'h' and i != '-' and i != '"':
                     s2 += i
             # Zapis v urah pri disciplinah z daljsimi progami
             for j,i in enumerate(s2.split(':')):
@@ -470,6 +474,37 @@ def men_vs_women(slovar, mendisciplina, womendisciplina):
     #plt.show()
     #fig.savefig('Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}'.format(mendisciplina[:-4]))
 
+def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
+    '''
+    Funkcija izrise zemljevid in velicina pik oznacuje stevilo tekmovalcev iz te
+    drzave.
+    '''
+
+    drzave=[]
+    kolicina=[]
+    longitudes=[]
+    latitudes=[]
+
+    for drzava in slovar_kolicin:
+        if drzava in slovar_koordinat:
+            drzave.append(drzava)
+            kolicina.append(slovar_kolicin[drzava])
+            longitudes.append(slovar_koordinat[drzava][0])
+            latitudes.append(slovar_koordinat[drzava][1])
+
+    fig = plt.figure()
+
+    map = Basemap()
+    map.drawcoastlines()
+    map.fillcontinents(color='white')
+
+    for i in range(len(drzave)):
+        plt.scatter(latitudes[i],longitudes[i],marker='o',s=kolicina[i], c='red',edgecolors='white',zorder=2*(len(drzave)-1-i))
+        
+    plt.show()
+    
+    
+
 
 ########################################################################################################################
 ########################################################################################################################
@@ -504,40 +539,100 @@ with open('roj_dan_tekmovalcev.csv', 'r', encoding="utf-8") as dat:
         if razdeljeno[0] in podatki_tekmovalcev:
             podatki_tekmovalcev[razdeljeno[0]].append(razdeljeno[1][:-1])
 
+drzave_s_koordinatami={}
+with open('koordinate.csv', 'r', encoding="utf-8") as dat:
+    vrstice=dat.readlines()
+    for vrstica in vrstice[1:]:
+        if vrstica=='\n':
+            continue
+        drzava, geo_dolzina, geo_sirina = vrstica.split(',')
+        geo_sirina=geo_sirina[:-1]
+        drzave_s_koordinatami[drzava]=(geo_dolzina,geo_sirina)
+
+for drzava in drzave_s_koordinatami:
+    geo_dolzina,geo_sirina = drzave_s_koordinatami[drzava]
+    longitude=0
+    if geo_dolzina != '':
+        stopinje, preostalo1 = geo_dolzina.split('°')
+        if len(preostalo1) != 1:
+            minute, preostalo2 = preostalo1.split("′")
+            if len(preostalo2) != 1:
+                sekunde, preostalo3 = preostalo2.split('″')
+                if preostalo3 == 'N':
+                    longitude = float(stopinje) + float(minute)/60 + float(sekunde)/3600
+                else:
+                    longitude = -1*(float(stopinje) + float(minute)/60 + float(sekunde)/3600)                    
+            else:
+                if preostalo2 == 'N':
+                    longitude = float(stopinje) + float(minute)/60
+                else:
+                    longitude = -1*(float(stopinje) + float(minute)/60)
+        else:
+            if preostalo1 == 'N':
+                longitude = float(stopinje)
+            else:
+                longitude = -1*(float(stopinje))
+    latitude=0
+    if geo_sirina != '':
+        stopinje, preostalo1 = geo_sirina.split('°')
+        if len(preostalo1) != 1:
+            minute, preostalo2 = preostalo1.split("′")
+            if len(preostalo2) != 1:
+                sekunde, preostalo3 = preostalo2.split('″')
+                if preostalo3 == 'E':
+                    latitude = float(stopinje) + float(minute)/60 + float(sekunde)/3600
+                else:
+                    latitude = -1*(float(stopinje) + float(minute)/60 + float(sekunde)/3600)                    
+            else:
+                if preostalo2 == 'E':
+                    latitude = float(stopinje) + float(minute)/60
+                else:
+                    latitude = -1*(float(stopinje) + float(minute)/60)
+        else:
+            if preostalo1 == 'E':
+                latitude = float(stopinje)
+            else:
+                latitude = -1*(float(stopinje))
+    drzave_s_koordinatami[drzava]=(longitude, latitude)
+
+
 ########################################################################################################################
 ########################################################################################################################
 
 # Podatki, ki jih uporabimo
+slovar_kolicin=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
+narisi_zemlevid(slovar_kolicin,drzave_s_koordinatami)
 
-slovar=Tekmovalci(podatki_tekmovalcev).zmagovalci_po_disciplinah()
+
+#slovar1=Tekmovalci(podatki_tekmovalcev).zmagovalci_po_disciplinah()
 
 # za funkcijo plot_evolve
-discipline1=['marathon women','marathon men','10000m women','10000m men',
-             '5000m women','5000m men','1500m women','1500m men',
-             '50km walk men','20km walk men','hammer throw men','triple jump women',
-             '100m hurdles women','hammer throw women','400m men','400m women',
-             '400m hurdles men','400m hurdles women','triple jump men']
-for disciplina in discipline1:
-    plot_evolve(slovar, disciplina)
+#discipline1=['marathon women','marathon men','10000m women','10000m men',
+#             '5000m women','5000m men','1500m women','1500m men',
+#             '50km walk men','20km walk men','hammer throw men','triple jump women',
+#             '100m hurdles women','hammer throw women','400m men','400m women',
+#             '400m hurdles men','400m hurdles women','triple jump men']
+#for disciplina in discipline1:
+#    plot_evolve(slovar1, disciplina)
 
 # za funkcijo bar_st_drzav_po_disc
-discipline2=['discus throw women','long jump men','high jump women','800m women',
-             'marathon men','100m women','discus throw men','100m men']
-for disciplina in discipline2:
-    bar_st_drzav_po_disc(slovar, disciplina)
+#discipline2=['discus throw women','long jump men','high jump women','800m women',
+#             'marathon men','100m women','discus throw men','100m men']
+#for disciplina in discipline2:
+#    slovar2=Tekmovalci(podatki_tekmovalcev).st_raz_drzav_pri_disc(disciplina)
+#    bar_st_drzav_po_disc(slovar2, disciplina)
 
 # za funkcijo st_tek_iz_drzav
-drzave=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
-st_tek_iz_drzav(drzave)
+#drzave=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
+#st_tek_iz_drzav(drzave)
 
 # za funkcijo men_vs_women
-seznam3=[('shot put men','shot put women'),('100m men','100m women'),
-        ('200m men','200m women'),('javelin throw men','javelin throw women'),
-        ('long jump men','long jump women'),('high jump men', 'high jump women'),
-        ('discus throw men','discus throw women')]
-
-for men, women in seznam3:
-    men_vs_women(slovar,men,women)
+#seznam3=[('shot put men','shot put women'),('100m men','100m women'),
+#        ('200m men','200m women'),('javelin throw men','javelin throw women'),
+#        ('long jump men','long jump women'),('high jump men', 'high jump women'),
+#        ('discus throw men','discus throw women')]
+#for men, women in seznam3:
+#    men_vs_women(slovar1,men,women)
 
 
 
