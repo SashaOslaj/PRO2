@@ -322,7 +322,7 @@ def plot_evolve(slovar, disciplina):
     plt.xlabel("Leta")
     plt.ylabel("Rezultati")
     plt.legend(loc='best')
-
+    plt.close()
     #plt.show()
     #fig.savefig('rezultati_skozi_cas_pri_{}_disciplini'.format(disciplina))
 
@@ -347,7 +347,7 @@ def bar_st_drzav_po_disc(slovar, disciplina):
     plt.title('Stevilo drzav pri {} disciplini'.format(disciplina))
     plt.ylabel('Olimpijske igre')
     plt.xlabel('Stevilo drzav')
-
+    plt.close()
     #plt.show()
     #fig.savefig('stevilo_drzav_skozi_cas_pri_{}_disciplini'.format(disciplina))
 
@@ -374,6 +374,7 @@ def st_tek_iz_drzav(slovar):
     plt.ylabel('Stevilo tekmovalcev')
 
     fig.autofmt_xdate()
+    plt.close()
     #plt.show()
     #fig.savefig('St_tek_iz_pos_drzave')
 
@@ -471,6 +472,7 @@ def men_vs_women(slovar, mendisciplina, womendisciplina):
     plt.ylabel("Rezultati")
     plt.legend(loc='best')
 
+    plt.close()
     #plt.show()
     #fig.savefig('Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}'.format(mendisciplina[:-4]))
 
@@ -489,19 +491,27 @@ def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
         if drzava in slovar_koordinat:
             drzave.append(drzava)
             kolicina.append(slovar_kolicin[drzava])
-            longitudes.append(slovar_koordinat[drzava][0])
-            latitudes.append(slovar_koordinat[drzava][1])
+            latitudes.append(slovar_koordinat[drzava][0])
+            longitudes.append(slovar_koordinat[drzava][1])
 
-    fig = plt.figure()
+    fig=plt.figure(figsize=(16,11))
 
     map = Basemap()
     map.drawcoastlines()
-    map.fillcontinents(color='white')
+    map.drawmapboundary(fill_color='aqua')
+    map.fillcontinents(color='coral', lake_color='aqua')
 
     for i in range(len(drzave)):
-        plt.scatter(latitudes[i],longitudes[i],marker='o',s=kolicina[i], c='red',edgecolors='white',zorder=2*(len(drzave)-1-i))
         
-    plt.show()
+        plt.scatter(longitudes[i],latitudes[i],marker='o',s=kolicina[i], c='white',edgecolors='gray',zorder=2*(len(drzave)-1-i))
+
+    plt.title('Od kod prihajajo atleti')
+    plt.ylabel('Country latitude')
+    plt.xlabel('Country longitude')    
+    
+    #plt.close()
+    #plt.show()
+    fig.savefig('Od kod prihajajo atleti')
     
     
 
