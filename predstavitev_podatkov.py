@@ -324,7 +324,7 @@ def plot_evolve(slovar, disciplina):
     plt.legend(loc='best')
     plt.close()
     #plt.show()
-    #fig.savefig('rezultati_skozi_cas_pri_{}_disciplini'.format(disciplina))
+    fig.savefig('grafi_za_oi/rezultati_skozi_cas_pri_{}_disciplini.pdf'.format(disciplina))
 
 def bar_st_drzav_po_disc(slovar, disciplina):
     '''
@@ -349,7 +349,7 @@ def bar_st_drzav_po_disc(slovar, disciplina):
     plt.xlabel('Stevilo drzav')
     plt.close()
     #plt.show()
-    #fig.savefig('stevilo_drzav_skozi_cas_pri_{}_disciplini'.format(disciplina))
+    fig.savefig('grafi_za_oi/stevilo_drzav_skozi_cas_pri_{}_disciplini.pdf'.format(disciplina))
 
 def st_tek_iz_drzav(slovar):
     '''
@@ -376,7 +376,7 @@ def st_tek_iz_drzav(slovar):
     fig.autofmt_xdate()
     plt.close()
     #plt.show()
-    #fig.savefig('St_tek_iz_pos_drzave')
+    fig.savefig('grafi_za_oi/St_tek_iz_pos_drzave.pdf')
 
 def men_vs_women(slovar, mendisciplina, womendisciplina):
     '''
@@ -474,7 +474,7 @@ def men_vs_women(slovar, mendisciplina, womendisciplina):
 
     plt.close()
     #plt.show()
-    #fig.savefig('Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}'.format(mendisciplina[:-4]))
+    fig.savefig('grafi_za_oi/Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}.pdf'.format(mendisciplina[:-4]))
 
 def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
     '''
@@ -509,9 +509,9 @@ def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
     plt.ylabel('Country latitude')
     plt.xlabel('Country longitude')    
     
-    #plt.close()
+    plt.close()
     #plt.show()
-    fig.savefig('Od kod prihajajo atleti')
+    fig.savefig('grafi_za_oi/Od kod prihajajo atleti.pdf')
     
     
 
@@ -610,39 +610,41 @@ for drzava in drzave_s_koordinatami:
 ########################################################################################################################
 
 # Podatki, ki jih uporabimo
+
+# za izris zemljevida
 slovar_kolicin=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
 narisi_zemlevid(slovar_kolicin,drzave_s_koordinatami)
 
 
-#slovar1=Tekmovalci(podatki_tekmovalcev).zmagovalci_po_disciplinah()
+slovar1=Tekmovalci(podatki_tekmovalcev).zmagovalci_po_disciplinah()
 
 # za funkcijo plot_evolve
-#discipline1=['marathon women','marathon men','10000m women','10000m men',
-#             '5000m women','5000m men','1500m women','1500m men',
-#             '50km walk men','20km walk men','hammer throw men','triple jump women',
-#             '100m hurdles women','hammer throw women','400m men','400m women',
-#             '400m hurdles men','400m hurdles women','triple jump men']
-#for disciplina in discipline1:
-#    plot_evolve(slovar1, disciplina)
+discipline1=['marathon women','marathon men','10000m women','10000m men',
+             '5000m women','5000m men','1500m women','1500m men',
+             '50km walk men','20km walk men','hammer throw men','triple jump women',
+             '100m hurdles women','hammer throw women','400m men','400m women',
+             '400m hurdles men','400m hurdles women','triple jump men']
+for disciplina in discipline1:
+    plot_evolve(slovar1, disciplina)
 
 # za funkcijo bar_st_drzav_po_disc
-#discipline2=['discus throw women','long jump men','high jump women','800m women',
-#             'marathon men','100m women','discus throw men','100m men']
-#for disciplina in discipline2:
-#    slovar2=Tekmovalci(podatki_tekmovalcev).st_raz_drzav_pri_disc(disciplina)
-#    bar_st_drzav_po_disc(slovar2, disciplina)
+discipline2=['discus throw women','long jump men','high jump women','800m women',
+             'marathon men','100m women','discus throw men','100m men']
+for disciplina in discipline2:
+    slovar2=Tekmovalci(podatki_tekmovalcev).st_raz_drzav_pri_disc(disciplina)
+    bar_st_drzav_po_disc(slovar2, disciplina)
 
 # za funkcijo st_tek_iz_drzav
-#drzave=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
-#st_tek_iz_drzav(drzave)
+drzave=Tekmovalci(podatki_tekmovalcev).tekmovalec_in_drzava()
+st_tek_iz_drzav(drzave)
 
 # za funkcijo men_vs_women
-#seznam3=[('shot put men','shot put women'),('100m men','100m women'),
-#        ('200m men','200m women'),('javelin throw men','javelin throw women'),
-#        ('long jump men','long jump women'),('high jump men', 'high jump women'),
-#        ('discus throw men','discus throw women')]
-#for men, women in seznam3:
-#    men_vs_women(slovar1,men,women)
+seznam3=[('shot put men','shot put women'),('100m men','100m women'),
+        ('200m men','200m women'),('javelin throw men','javelin throw women'),
+        ('long jump men','long jump women'),('high jump men', 'high jump women'),
+        ('discus throw men','discus throw women')]
+for men, women in seznam3:
+    men_vs_women(slovar1,men,women)
 
 
 
