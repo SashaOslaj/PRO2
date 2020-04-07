@@ -368,7 +368,7 @@ def st_tek_iz_drzav(slovar):
     # Izris oz shranitev grafa
     fig=plt.figure(figsize=(6,10))
 
-    plt.barh(drzave, st_tekmovalcev, color='gray',edgecolor='white')
+    plt.bar(drzave, st_tekmovalcev, color='gray',edgecolor='white')
     plt.title('Stevilo tekmovalcev iz posameznih drzav, kjer je stevilo vecje od 100')
     plt.xlabel('Drzave')
     plt.ylabel('Stevilo tekmovalcev')
@@ -474,7 +474,7 @@ def men_vs_women(slovar, mendisciplina, womendisciplina):
 
     plt.close()
     #plt.show()
-    fig.savefig('grafi_za_oi/Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}.pdf'.format(mendisciplina[:-4]))
+    #fig.savefig('grafi_za_oi/Primerjava moskih in zenskih zmagovalcev skozi cas pri disciplini {}.pdf'.format(mendisciplina[:-4]))
 
 def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
     '''
@@ -511,7 +511,7 @@ def narisi_zemlevid(slovar_kolicin, slovar_koordinat):
     
     plt.close()
     #plt.show()
-    fig.savefig('grafi_za_oi/Od kod prihajajo atleti.pdf')
+    #fig.savefig('grafi_za_oi/Od kod prihajajo atleti.pdf')
     
     
 
